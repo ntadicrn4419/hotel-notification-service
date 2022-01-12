@@ -35,7 +35,7 @@ public class MessageListener {
             return;
         }
         if(dto.getType().equals("SUCCESSFUL_RESERVATION_EMAIL")){
-            notificationService.sendSuccessfullReservationEmail(dto);
+            notificationService.sendSuccessfulReservationEmail(dto);
             return;
         }
         if(dto.getType().equals("CANCEL_RESERVATION_EMAIL")){

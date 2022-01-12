@@ -5,11 +5,14 @@ import com.sk.hotelnotificationservice.domain.NotificationType;
 import com.sk.hotelnotificationservice.dto.NotificationDto;
 import com.sk.hotelnotificationservice.repository.NotificationRepository;
 import com.sk.hotelnotificationservice.service.NotificationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @Transactional
@@ -21,6 +24,21 @@ public class NotificationServiceImpl implements NotificationService{
     public NotificationServiceImpl(NotificationRepository notificationRepository, JavaMailSender mailSender) {
         this.notificationRepository = notificationRepository;
         this.mailSender = mailSender;
+    }
+
+    @Override
+    public List<Notification> findNotificationsByEmail(String email) {
+        return this.notificationRepository.findAllByTo(email);
+    }
+
+    @Override
+    public List<Notification> findNotificationsByType(String type) {
+        return notificationRepository.findAllByType(type);
+    }
+
+    @Override
+    public Page<Notification> findAll(Pageable pageable) {
+        return notificationRepository.findAll(pageable);
     }
 
     @Override
@@ -52,7 +70,7 @@ public class NotificationServiceImpl implements NotificationService{
     }
 
     @Override
-    public void sendSuccessfullReservationEmail(NotificationDto dto) {
+    public void sendSuccessfulReservationEmail(NotificationDto dto) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("hotelnotificationservice@gmail.com");
         message.setTo(dto.getTo());

@@ -12,12 +12,14 @@ public class Notification {
     private String content;
     @Embedded
     private NotificationType notificationType;
+    private String type;
 
     public Notification(String to, String subject, String content, NotificationType notificationType) {
         this.to = to;
         this.subject = subject;
         this.content = content;
         this.notificationType = notificationType;
+        this.type = notificationType.toString();
     }
     public Notification(){
 
@@ -61,5 +63,13 @@ public class Notification {
 
     public void setNotificationType(NotificationType notificationType) {
         this.notificationType = notificationType;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
