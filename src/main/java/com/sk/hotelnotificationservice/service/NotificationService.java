@@ -7,11 +7,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Component
 public interface NotificationService {
+    List<Notification> findNotificationsInDateRange(Date endDate, Date startDate);
     List<Notification> findNotificationsByEmail(String email);
     List<Notification> findNotificationsByType(String notificationType);
 
@@ -21,4 +23,5 @@ public interface NotificationService {
     void sendSuccessfulReservationEmail(NotificationDto dto);
     void sendCancelReservationEmail(NotificationDto dto);
     void send2DaysReminderEmail(NotificationDto dto);
+
 }

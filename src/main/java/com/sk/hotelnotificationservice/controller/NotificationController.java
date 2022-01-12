@@ -2,6 +2,7 @@ package com.sk.hotelnotificationservice.controller;
 
 import com.sk.hotelnotificationservice.domain.Notification;
 import com.sk.hotelnotificationservice.domain.NotificationType;
+import com.sk.hotelnotificationservice.dto.DateRangeDto;
 import com.sk.hotelnotificationservice.dto.EmailDto;
 import com.sk.hotelnotificationservice.dto.NotificationTypeDto;
 import com.sk.hotelnotificationservice.security.CheckSecurity;
@@ -62,4 +63,12 @@ public class NotificationController {
         return new ResponseEntity<>(p, HttpStatus.OK);
     }
 
+    @PostMapping("/getNotificationsInDateRange")
+    @CheckSecurity(roles = {"ROLE_ADMIN"})
+    public ResponseEntity<Page<Notification>> getNotificationsInDateRange(@RequestHeader("Authorization") String authorization,
+                                                                          @RequestBody @Valid DateRangeDto dto, Pageable pageable) {
+        List<Notification> notifications = notificationService.findNotificationsInDateRange(dto.getStartDate(), dto.getEndDate());
+        Page p = new PageImpl(notifications, pageable, notifications.size());
+        return new ResponseEntity<>(p, HttpStatus.OK);
+    }
 }

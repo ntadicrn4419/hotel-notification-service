@@ -1,6 +1,7 @@
 package com.sk.hotelnotificationservice.domain;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 public class Notification {
@@ -13,13 +14,15 @@ public class Notification {
     @Embedded
     private NotificationType notificationType;
     private String type;
+    private Date dateCreated;
 
-    public Notification(String to, String subject, String content, NotificationType notificationType) {
+    public Notification(String to, String subject, String content, NotificationType notificationType, Date dateCreated) {
         this.to = to;
         this.subject = subject;
         this.content = content;
         this.notificationType = notificationType;
         this.type = notificationType.toString();
+        this.dateCreated = dateCreated;
     }
     public Notification(){
 
@@ -71,5 +74,13 @@ public class Notification {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
     }
 }

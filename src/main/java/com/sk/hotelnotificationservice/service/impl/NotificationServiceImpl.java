@@ -12,6 +12,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -24,6 +25,11 @@ public class NotificationServiceImpl implements NotificationService{
     public NotificationServiceImpl(NotificationRepository notificationRepository, JavaMailSender mailSender) {
         this.notificationRepository = notificationRepository;
         this.mailSender = mailSender;
+    }
+
+    @Override
+    public List<Notification> findNotificationsInDateRange(Date startDate, Date endDate) {
+        return this.notificationRepository.findAllByDateCreatedBetween(startDate, endDate);
     }
 
     @Override
@@ -51,7 +57,7 @@ public class NotificationServiceImpl implements NotificationService{
         message.setText(content);
         mailSender.send(message);
 
-        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.ACTIVATION_EMAIL);
+        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.ACTIVATION_EMAIL, new Date());
         notificationRepository.save(notification);
     }
 
@@ -65,7 +71,7 @@ public class NotificationServiceImpl implements NotificationService{
         message.setText(content);
         mailSender.send(message);
 
-        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.RESET_PASSWORD_EMAIL);
+        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.RESET_PASSWORD_EMAIL, new Date());
         notificationRepository.save(notification);
     }
 
@@ -79,7 +85,7 @@ public class NotificationServiceImpl implements NotificationService{
         message.setText(content);
         mailSender.send(message);
 
-        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.SUCCESSFUL_RESERVATION_EMAIL);
+        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.SUCCESSFUL_RESERVATION_EMAIL, new Date());
         notificationRepository.save(notification);
     }
 
@@ -93,7 +99,7 @@ public class NotificationServiceImpl implements NotificationService{
         message.setText(content);
         mailSender.send(message);
 
-        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.CANCEL_RESERVATION_EMAIL);
+        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.CANCEL_RESERVATION_EMAIL, new Date());
         notificationRepository.save(notification);
     }
 
@@ -107,7 +113,7 @@ public class NotificationServiceImpl implements NotificationService{
         message.setText(content);
         mailSender.send(message);
 
-        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.TWO_DAYS_REMINDER_EMAIL);
+        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.TWO_DAYS_REMINDER_EMAIL, new Date());
         notificationRepository.save(notification);
     }
 }
