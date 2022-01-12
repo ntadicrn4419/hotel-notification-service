@@ -21,11 +21,30 @@ public class MessageListener {
         this.objectMapper = objectMapper;
         this.notificationService = notificationService;
     }
-
-    @JmsListener(destination = "${destination.user.registrated.message}", concurrency = "5-10")
-    public void userRegistratedMessage(Message message) throws JMSException, JsonProcessingException {
+    @JmsListener(destination = "${destination.message}", concurrency = "5-10")
+    public void notificationMessage(Message message) throws JMSException, JsonProcessingException {
         String json = ((TextMessage)message).getText();
         NotificationDto dto = objectMapper.readValue(json, NotificationDto.class);
-        notificationService.sendActivationEmail(dto);
+
+        if(dto.getType().equals("ACTIVATION_EMAIL")){
+            notificationService.sendActivationEmail(dto);
+            return;
+        }
+        if(dto.getType().equals("RESET_PASSWORD_EMAIL")){
+            notificationService.sendResetPasswordEmail(dto);
+            return;
+        }
+        if(dto.getType().equals("SUCCESSFUL_RESERVATION_EMAIL")){
+            notificationService.sendSuccessfullReservationEmail(dto);
+            return;
+        }
+        if(dto.getType().equals("CANCEL_RESERVATION_EMAIL")){
+            notificationService.sendCancelReservationEmail(dto);
+            return;
+        }
+        if(dto.getType().equals("TWO_DAYS_REMINDER_EMAIL")){
+            notificationService.send2DaysReminderEmail(dto);
+            return;
+        }
     }
 }
