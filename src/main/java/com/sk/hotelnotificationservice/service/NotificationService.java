@@ -1,7 +1,6 @@
 package com.sk.hotelnotificationservice.service;
 
 import com.sk.hotelnotificationservice.domain.Notification;
-import com.sk.hotelnotificationservice.domain.NotificationType;
 import com.sk.hotelnotificationservice.dto.NotificationDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +21,6 @@ public interface NotificationService {
     void sendResetPasswordEmail(NotificationDto dto);
     void sendSuccessfulReservationEmail(NotificationDto dto);
     void sendCancelReservationEmail(NotificationDto dto);
-    void send2DaysReminderEmail(NotificationDto dto);
+    void send2DaysReminderEmail();
 
 }

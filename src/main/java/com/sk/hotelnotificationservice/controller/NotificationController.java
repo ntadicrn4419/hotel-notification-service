@@ -1,7 +1,6 @@
 package com.sk.hotelnotificationservice.controller;
 
 import com.sk.hotelnotificationservice.domain.Notification;
-import com.sk.hotelnotificationservice.domain.NotificationType;
 import com.sk.hotelnotificationservice.dto.DateRangeDto;
 import com.sk.hotelnotificationservice.dto.EmailDto;
 import com.sk.hotelnotificationservice.dto.NotificationTypeDto;

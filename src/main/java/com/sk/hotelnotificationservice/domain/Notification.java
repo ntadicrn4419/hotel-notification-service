@@ -11,17 +11,14 @@ public class Notification {
     private String to;
     private String subject;
     private String content;
-    @Embedded
-    private NotificationType notificationType;
-    private String type;
+    private String type; //ACTIVATION_EMAIL, RESET_PASSWORD_EMAIL, SUCCESSFUL_RESERVATION_EMAIL, CANCEL_RESERVATION_EMAIL, TWO_DAYS_REMINDER_EMAIL
     private Date dateCreated;
 
-    public Notification(String to, String subject, String content, NotificationType notificationType, Date dateCreated) {
+    public Notification(String to, String subject, String content, String type, Date dateCreated) {
         this.to = to;
         this.subject = subject;
         this.content = content;
-        this.notificationType = notificationType;
-        this.type = notificationType.toString();
+        this.type = type;
         this.dateCreated = dateCreated;
     }
     public Notification(){
@@ -58,14 +55,6 @@ public class Notification {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public NotificationType getNotificationType() {
-        return notificationType;
-    }
-
-    public void setNotificationType(NotificationType notificationType) {
-        this.notificationType = notificationType;
     }
 
     public String getType() {

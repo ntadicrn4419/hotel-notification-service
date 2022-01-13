@@ -1,9 +1,10 @@
 package com.sk.hotelnotificationservice.service.impl;
 
 import com.sk.hotelnotificationservice.domain.Notification;
-import com.sk.hotelnotificationservice.domain.NotificationType;
+import com.sk.hotelnotificationservice.domain.Reservation;
 import com.sk.hotelnotificationservice.dto.NotificationDto;
 import com.sk.hotelnotificationservice.repository.NotificationRepository;
+import com.sk.hotelnotificationservice.repository.ReservationRepository;
 import com.sk.hotelnotificationservice.service.NotificationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
@@ -20,11 +23,13 @@ import java.util.List;
 public class NotificationServiceImpl implements NotificationService{
 
     private NotificationRepository notificationRepository;
+    private ReservationRepository reservationRepository;
     private JavaMailSender mailSender;
 
-    public NotificationServiceImpl(NotificationRepository notificationRepository, JavaMailSender mailSender) {
+    public NotificationServiceImpl(NotificationRepository notificationRepository, JavaMailSender mailSender, ReservationRepository reservationRepository) {
         this.notificationRepository = notificationRepository;
         this.mailSender = mailSender;
+        this.reservationRepository = reservationRepository;
     }
 
     @Override
@@ -57,7 +62,7 @@ public class NotificationServiceImpl implements NotificationService{
         message.setText(content);
         mailSender.send(message);
 
-        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.ACTIVATION_EMAIL, new Date());
+        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, "ACTIVATION_EMAIL", new Date());
         notificationRepository.save(notification);
     }
 
@@ -71,12 +76,13 @@ public class NotificationServiceImpl implements NotificationService{
         message.setText(content);
         mailSender.send(message);
 
-        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.RESET_PASSWORD_EMAIL, new Date());
+        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, "RESET_PASSWORD_EMAIL", new Date());
         notificationRepository.save(notification);
     }
 
     @Override
     public void sendSuccessfulReservationEmail(NotificationDto dto) {
+        //Mail za klijenta
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("hotelnotificationservice@gmail.com");
         message.setTo(dto.getTo());
@@ -85,12 +91,30 @@ public class NotificationServiceImpl implements NotificationService{
         message.setText(content);
         mailSender.send(message);
 
-        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.SUCCESSFUL_RESERVATION_EMAIL, new Date());
+        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, "SUCCESSFUL_RESERVATION_EMAIL", new Date());
         notificationRepository.save(notification);
+
+        //Dodavanje rezervacije u repository
+        Reservation reservation = new Reservation(dto.getReservationTime(),false, dto.getTo(), dto.getUserFirstName(), dto.getUserLastName());
+        reservationRepository.save(reservation);
+
+        //Mail za menadzera hotela
+        SimpleMailMessage message2 = new SimpleMailMessage();
+        message2.setFrom("hotelnotificationservice@gmail.com");
+        message2.setTo(dto.getManagerEmail());
+        message2.setSubject(dto.getSubject());
+        String content2 = "Pozdrav " + dto.getManagerFirstName() + " " + dto.getManagerLastName() + ", \n" +
+                "Klijent " + dto.getUserFirstName() + " " + dto.getUserLastName() + " je uspesno rezervisao smestaj u vasem hotelu.";
+        message2.setText(content2);
+        mailSender.send(message2);
+
+        Notification notification2 = new Notification(dto.getManagerEmail(), dto.getSubject(), content2, "SUCCESSFUL_RESERVATION_EMAIL", new Date());
+        notificationRepository.save(notification2);
     }
 
     @Override
     public void sendCancelReservationEmail(NotificationDto dto) {
+        //Mail za klijenta
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("hotelnotificationservice@gmail.com");
         message.setTo(dto.getTo());
@@ -99,21 +123,45 @@ public class NotificationServiceImpl implements NotificationService{
         message.setText(content);
         mailSender.send(message);
 
-        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.CANCEL_RESERVATION_EMAIL, new Date());
+        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, "CANCEL_RESERVATION_EMAIL", new Date());
         notificationRepository.save(notification);
+
+        //Brisanje rezervacije iz repository-ja
+        Reservation reservation = reservationRepository.findReservationByUserEmailAndUserFirstNameAndUserLastName(dto.getTo(), dto.getUserFirstName(), dto.getManagerLastName());
+        reservationRepository.delete(reservation);
+
+        //Mail za menadzera hotela
+        SimpleMailMessage message2 = new SimpleMailMessage();
+        message2.setFrom("hotelnotificationservice@gmail.com");
+        message2.setTo(dto.getManagerEmail());
+        message2.setSubject(dto.getSubject());
+        String content2 = "Pozdrav " + dto.getManagerFirstName() + " " + dto.getManagerLastName() + ", \n" +
+                "Klijent " + dto.getUserFirstName() + " " + dto.getUserLastName() + " je otkazao rezervaciju u vasem hotelu.";
+        message2.setText(content2);
+        mailSender.send(message2);
+
+        Notification notification2 = new Notification(dto.getManagerEmail(), dto.getSubject(), content2, "CANCEL_RESERVATION_EMAIL", new Date());
+        notificationRepository.save(notification2);
     }
 
     @Override
-    public void send2DaysReminderEmail(NotificationDto dto) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("hotelnotificationservice@gmail.com");
-        message.setTo(dto.getTo());
-        message.setSubject(dto.getSubject());
-        String content = "Pozdrav " + dto.getUserFirstName() + " " + dto.getUserLastName() + ", \n" + "Ostalo je dva dana do vase rezervacije.";
-        message.setText(content);
-        mailSender.send(message);
+    public void send2DaysReminderEmail() {
+        reservationRepository.findAllByNotifiedAndReservationTimeGreaterThan(false,
+                Instant.now().minus(2, ChronoUnit.DAYS)).forEach( reservation ->{
+                    SimpleMailMessage message = new SimpleMailMessage();
+                    message.setFrom("hotelnotificationservice@gmail.com");
+                    message.setTo(reservation.getUserEmail());
+                    message.setSubject("2 days reminder");
+                    String content = "Pozdrav " + reservation.getUserFirstName() + " " + reservation.getUserLastName() +
+                            ",\n" + "Podsecamo Vas da je Vasa rezervacija za 2 dana.";
+                    message.setText(content);
+                    mailSender.send(message);
 
-        Notification notification = new Notification(dto.getTo(), dto.getSubject(), content, NotificationType.TWO_DAYS_REMINDER_EMAIL, new Date());
-        notificationRepository.save(notification);
+                    Notification notification = new Notification(reservation.getUserEmail(), "2 days reminder", content, "TWO_DAYS_REMINDER_EMAIL", new Date());
+                    notificationRepository.save(notification);
+
+                    reservation.setNotified(true);
+                    reservationRepository.save(reservation);
+        });
     }
 }
