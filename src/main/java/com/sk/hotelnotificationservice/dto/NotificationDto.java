@@ -3,6 +3,7 @@ package com.sk.hotelnotificationservice.dto;
 import java.time.Instant;
 
 public class NotificationDto {
+    private Long userId;
     private String to;//email
     private String subject;
     private String type;//ACTIVATION_EMAIL, RESET_PASSWORD_EMAIL, SUCCESSFUL_RESERVATION_EMAIL, CANCEL_RESERVATION_EMAIL, TWO_DAYS_REMINDER_EMAIL
@@ -13,16 +14,18 @@ public class NotificationDto {
     private String managerEmail;
     private Instant reservationTime;
 
-    public NotificationDto(String to, String subject, String type, String userFirstName, String userLastName) {
+    public NotificationDto(Long userId, String to, String subject, String type, String userFirstName, String userLastName) {
+        this.userId = userId;
         this.to = to;
         this.subject = subject;
         this.type = type;
         this.userFirstName = userFirstName;
         this.userLastName = userLastName;
-
     }
-    public NotificationDto(String to, String subject, String type, String userFirstName, String userLastName,
+
+    public NotificationDto(Long userId, String to, String subject, String type, String userFirstName, String userLastName,
                            String managerFirstName, String managerLastName, String managerEmail, Instant reservationTime) {
+        this.userId = userId;
         this.to = to;
         this.subject = subject;
         this.type = type;
@@ -36,6 +39,14 @@ public class NotificationDto {
 
     public NotificationDto(){
 
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getTo() {
@@ -110,4 +121,3 @@ public class NotificationDto {
         this.reservationTime = reservationTime;
     }
 }
-

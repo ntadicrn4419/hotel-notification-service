@@ -37,7 +37,7 @@ public class MessageListener {
         if(dto.getType().equals("SUCCESSFUL_RESERVATION_EMAIL")){
             notificationService.sendSuccessfulReservationEmail(dto);
 //            //ovako treba da izgleda dto koji reservation service treba da posalje
-//            NotificationDto dtoProba = new NotificationDto("tadic.nikola00@gmail.com", "proba", "SUCCESSFUL_RESERVATION_EMAIL",
+//            NotificationDto dtoProba = new NotificationDto(2, "tadic.nikola00@gmail.com", "proba", "SUCCESSFUL_RESERVATION_EMAIL",
 //                    "Milorad", "Milinkovic", "Zika", "Pavlovic",
 //                    "nikola091291@gmail.com", Instant.now().plus(1, ChronoUnit.DAYS));
 //            notificationService.sendSuccessfulReservationEmail(dtoProba);

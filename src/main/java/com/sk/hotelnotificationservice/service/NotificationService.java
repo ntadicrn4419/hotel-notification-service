@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public interface NotificationService {
@@ -23,4 +22,5 @@ public interface NotificationService {
     void sendCancelReservationEmail(NotificationDto dto);
     void send2DaysReminderEmail();
 
+    List<Notification> findUserNotifications(String authorization, Pageable pageable);
 }

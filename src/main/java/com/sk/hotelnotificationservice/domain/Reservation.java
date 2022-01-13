@@ -11,13 +11,15 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long userId;// id of user who made this reservation;
     private Instant reservationTime;
     private Boolean notified;
     private String userEmail;
     private String userFirstName;
     private String userLastName;
 
-    public Reservation(Instant reservationTime, Boolean notified, String userEmail, String userFirstName, String userLastName) {
+    public Reservation(Long userId, Instant reservationTime, Boolean notified, String userEmail, String userFirstName, String userLastName) {
+        this.userId = userId;
         this.reservationTime = reservationTime;
         this.notified = notified;
         this.userEmail = userEmail;
@@ -27,13 +29,20 @@ public class Reservation {
     public Reservation(){
 
     }
-
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Instant getReservationTime() {

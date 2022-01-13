@@ -43,6 +43,16 @@ public class NotificationController {
 
         return new ResponseEntity<>(notificationService.findAll(pageable), HttpStatus.OK);
     }
+    @GetMapping("/getUserNotifications")
+    @CheckSecurity(roles = {"ROLE_ADMIN", "ROLE_MANAGER", "ROLE_CLIENT"})
+    public ResponseEntity<Page<Notification>> getUserNotifications(@RequestHeader("Authorization") String authorization,
+                                                                  Pageable pageable) {
+
+        List<Notification> notifications = notificationService.findUserNotifications(authorization, pageable);
+        Page p = new PageImpl(notifications, pageable, notifications.size());
+        return new ResponseEntity<>(p, HttpStatus.OK);
+    }
+
 
     @PostMapping("/getNotificationsByType")
     @CheckSecurity(roles = {"ROLE_ADMIN"})
@@ -70,4 +80,5 @@ public class NotificationController {
         Page p = new PageImpl(notifications, pageable, notifications.size());
         return new ResponseEntity<>(p, HttpStatus.OK);
     }
+
 }
