@@ -62,6 +62,7 @@ public class NotificationServiceImpl implements NotificationService{
 
     @Override
     public List<Notification> findUserNotifications(String authorization, Pageable pageable) {
+        //auth[0] = "Bearer" -> zato splitujemo authorization
         String[] auth = authorization.split(" ");
         String token = auth[1];
         Claims claims = tokenService.parseToken(token);
